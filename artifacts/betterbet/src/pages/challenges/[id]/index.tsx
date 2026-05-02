@@ -321,8 +321,11 @@ export default function ChallengeDashboard() {
       </div>
 
       {/* Floating Action Button for Check-in */}
-      {!isPending && !isCompleted && challenge.participants.length === 2 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent md:max-w-lg md:mx-auto">
+      {!isPending && !isCompleted && (
+        <div
+          className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent md:max-w-lg md:mx-auto"
+          style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+        >
           {checkedInToday ? (
             <Button
               disabled
