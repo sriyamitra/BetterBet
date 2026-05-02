@@ -162,7 +162,7 @@ export default function ChallengeDashboard() {
         </div>
       )}
 
-      <div className="p-4 pt-6 pb-24 space-y-6">
+      <div className="p-4 pt-6 pb-44 space-y-6">
 
         {/* Header */}
         <div className="flex justify-between items-start">
@@ -320,10 +320,10 @@ export default function ChallengeDashboard() {
         )}
       </div>
 
-      {/* Floating Action Button for Check-in */}
+      {/* Floating Action Button for Check-in — sits above the bottom nav (h-16) on mobile */}
       {!isPending && !isCompleted && (
         <div
-          className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent md:max-w-lg md:mx-auto"
+          className="fixed bottom-16 left-0 right-0 p-4 z-40 bg-gradient-to-t from-background via-background to-transparent md:bottom-0 md:max-w-lg md:mx-auto"
           style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
         >
           {checkedInToday ? (

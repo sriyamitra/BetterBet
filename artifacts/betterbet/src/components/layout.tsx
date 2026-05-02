@@ -49,9 +49,9 @@ export function Layout({ children, showNav = true }: LayoutProps) {
                 <PlusCircle className="h-8 w-8" />
               </Link>
             </div>
-            <Link href="/profile" className="flex flex-col items-center justify-center w-full h-full text-muted-foreground hover:text-primary focus:text-primary">
+            <Link href="/challenges" className="flex flex-col items-center justify-center w-full h-full text-muted-foreground hover:text-primary focus:text-primary">
               <Trophy className="h-6 w-6 mb-1" />
-              <span className="text-[10px] font-medium">Wins</span>
+              <span className="text-[10px] font-medium">Challenges</span>
             </Link>
           </div>
         </nav>
