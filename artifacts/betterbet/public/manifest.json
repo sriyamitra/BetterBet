@@ -1,17 +1,21 @@
 {
   "name": "BetterBet",
   "short_name": "BetterBet",
-  "theme_color": "#4f46e5",
-  "background_color": "#fafafa",
+  "description": "Challenge a friend. Check in daily with photo proof. Loser pays up.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "scope": "/",
-  "start_url": "/",
+  "background_color": "#fafafa",
+  "theme_color": "#4338ca",
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "lang": "en-US"
 }
