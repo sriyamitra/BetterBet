@@ -98,8 +98,8 @@ router.post("/challenges", requireAuth, async (req: AuthenticatedRequest, res) =
   res.status(201).json(formatChallenge(challenge, [participant]));
 });
 
-// GET /challenges/join/:inviteCode  (must come before /:challengeId)
-router.get("/challenges/join/:inviteCode", requireAuth, async (req: AuthenticatedRequest, res) => {
+// GET /challenges/join/:inviteCode  (must come before /:challengeId) — public, no auth required
+router.get("/challenges/join/:inviteCode", async (req, res) => {
   const { inviteCode } = req.params;
   const [challenge] = await db.select().from(challengesTable).where(eq(challengesTable.inviteCode, inviteCode)).limit(1);
 
