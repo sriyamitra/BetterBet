@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetChallengeSummary, getGetChallengeSummaryQueryKey } from "@workspace/api-client-react";
 import { useRoute, useLocation, Link } from "wouter";
-import { Trophy, Clock, Image as ImageIcon, Copy, Check, Info } from "lucide-react";
+import { Trophy, Clock, Image as ImageIcon, Copy, Check, Info, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
