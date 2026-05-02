@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetChallengeSummary, getGetChallengeSummaryQueryKey } from "@workspace/api-client-react";
 import { useRoute, useLocation, Link } from "wouter";
-import { Trophy, Clock, Image as ImageIcon, Copy, Check, Info, Users } from "lucide-react";
+import { Trophy, Clock, Image as ImageIcon, Copy, Check, Info, Users, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
@@ -27,12 +27,37 @@ export default function ChallengeDashboard() {
     }
   });
 
-  const copyInvite = () => {
-    if (summary?.challenge.inviteCode) {
-      navigator.clipboard.writeText(summary.challenge.inviteCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast({ title: "Copied!", description: "Invite code copied to clipboard." });
+  const getInviteUrl = () => {
+    const code = summary?.challenge.inviteCode;
+    if (!code) return "";
+    return `${window.location.origin}/join/${code}`;
+  };
+
+  const copyInvite = async () => {
+    const url = getInviteUrl();
+    if (!url) return;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({ title: "Link copied!", description: "Send it to your friend." });
+  };
+
+  const shareInvite = async () => {
+    const url = getInviteUrl();
+    const code = summary?.challenge.inviteCode;
+    if (!url) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Join my BetterBet challenge: ${summary?.challenge.title}`,
+          text: `I'm challenging you! Use code ${code} or tap the link to accept.`,
+          url,
+        });
+      } catch {
+        // user cancelled share — no-op
+      }
+    } else {
+      await copyInvite();
     }
   };
 
@@ -129,16 +154,28 @@ export default function ChallengeDashboard() {
             <CardContent className="p-6 text-center flex flex-col items-center">
               <Users className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-xl font-bold mb-2">Waiting for opponent</h3>
-              <p className="text-sm text-muted-foreground mb-6">Share this code with a friend so they can join.</p>
-              
-              <div className="flex items-center justify-center gap-2 mb-4 bg-background border rounded-lg p-2 w-full max-w-xs mx-auto">
+              <p className="text-sm text-muted-foreground mb-6">Share this link with a friend so they can join.</p>
+
+              {/* Invite code badge */}
+              <div className="flex items-center justify-center gap-2 mb-3 bg-background border rounded-lg p-2 w-full max-w-xs mx-auto">
                 <span className="text-3xl font-mono font-bold tracking-widest px-4 py-2">{challenge.inviteCode}</span>
               </div>
-              
-              <Button variant="secondary" onClick={copyInvite} className="font-bold">
-                {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
-                {copied ? "Copied!" : "Copy Code"}
-              </Button>
+
+              {/* Full link preview */}
+              <p className="text-xs text-muted-foreground font-mono break-all mb-5 px-2 max-w-xs">
+                {getInviteUrl()}
+              </p>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 w-full max-w-xs">
+                <Button variant="outline" onClick={copyInvite} className="flex-1 font-bold">
+                  {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+                  {copied ? "Copied!" : "Copy Link"}
+                </Button>
+                <Button variant="secondary" onClick={shareInvite} className="flex-1 font-bold">
+                  <Share2 className="h-4 w-4 mr-2" /> Share
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (
