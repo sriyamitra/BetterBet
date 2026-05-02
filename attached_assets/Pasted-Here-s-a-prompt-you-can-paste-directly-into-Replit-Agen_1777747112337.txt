@@ -1,0 +1,68 @@
+Here's a prompt you can paste directly into Replit Agent:
+
+---
+
+**Build a mobile-friendly web app called "BetterBet" – an accountability tracker with wagers between two people.**
+
+## Core Concept
+Two users create a challenge together. One person sets a goal (e.g. "workout 4 days this week"), defines a wager (e.g. "buys dinner / $10 / coffee"), and both must post daily photo proof. If the challenger fails, they owe the wager.
+
+## Tech Stack
+- **Frontend:** React (mobile-first, PWA-ready so it works like an app on phone browsers)
+- **Backend:** Node.js + Express
+- **Database:** Supabase (free tier) for users, challenges, and photo storage
+- **Auth:** Simple magic link or username/PIN login (no OAuth needed, keep it simple)
+- **Hosting:** Render or Railway free tier
+
+## Features to Build
+
+### 1. Challenge Setup
+- Person A creates a challenge with:
+  - Goal description (text, e.g. "Workout 4x this week")
+  - Duration (e.g. 7 days, 30 days)
+  - Required check-ins per week (e.g. 4 out of 7 days)
+  - Wager description (text, e.g. "buys the other person dinner")
+- App generates a short invite link/code
+- Person B joins via the link
+
+### 2. Daily Check-ins
+- Both users see a daily "Check In" button
+- They upload a photo as proof (from camera or gallery)
+- Each day shows a status: ✅ checked in / ⏳ pending / ❌ missed
+- Simple calendar/streak view showing each person's progress
+
+### 3. Challenge Dashboard
+- Shows both users' check-in progress side by side
+- Countdown to deadline
+- Running tally: "Person A: 3/4 days ✅ | Person B: 2/4 days ⏳"
+- Wager reminder shown at top: "Loser buys dinner 🍕"
+
+### 4. End of Challenge
+- App calculates who met the goal and who didn't
+- Shows result screen: "Person A won! Person B owes: dinner 🍕"
+- If both complete it → "Both won! No wager owed 🎉"
+- If both fail → custom message
+
+### 5. Notifications (optional but nice)
+- Daily reminder nudge (can be a simple in-app banner or browser push notification)
+
+## UX Requirements
+- **Mobile-first design** – big buttons, easy photo upload, works great in a phone browser
+- No app store needed – works as a PWA (Add to Home Screen)
+- Clean, fun UI – think bold colors, emoji, motivational tone
+- Both users should be able to use it from their phones via a shared URL
+
+## Auth (keep it simple)
+- User picks a display name + 4-digit PIN
+- No email required
+- Store session in localStorage
+
+## Data Model (rough guide)
+- `challenges`: id, title, goal, wager, duration, required_checkins, created_by, invite_code, status
+- `participants`: challenge_id, user_id, display_name
+- `checkins`: id, challenge_id, user_id, date, photo_url, timestamp
+- `users`: id, display_name, pin_hash
+
+---
+
+Feel free to tweak the app name or colors. The key things to emphasize if Replit asks follow-up questions: **no App Store, free hosting, photo upload from phone camera, two-player only**.

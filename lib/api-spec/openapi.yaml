@@ -3,13 +3,19 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: BetterBet API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: challenges
+    description: Challenge operations
+  - name: checkins
+    description: Check-in operations
 paths:
   /healthz:
     get:
@@ -24,6 +30,283 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Display name taken
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with display name and PIN
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /challenges:
+    get:
+      operationId: listChallenges
+      tags: [challenges]
+      summary: List challenges for current user
+      responses:
+        "200":
+          description: List of challenges
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChallengeWithParticipants"
+    post:
+      operationId: createChallenge
+      tags: [challenges]
+      summary: Create a new challenge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateChallengeBody"
+      responses:
+        "201":
+          description: Challenge created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeWithParticipants"
+
+  /challenges/{challengeId}:
+    get:
+      operationId: getChallenge
+      tags: [challenges]
+      summary: Get a challenge by ID
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Challenge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeWithParticipants"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /challenges/join/{inviteCode}:
+    get:
+      operationId: getChallengeByInviteCode
+      tags: [challenges]
+      summary: Get challenge by invite code
+      parameters:
+        - name: inviteCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Challenge found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeWithParticipants"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /challenges/{challengeId}/join:
+    post:
+      operationId: joinChallenge
+      tags: [challenges]
+      summary: Join a challenge
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Joined challenge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeWithParticipants"
+        "400":
+          description: Already joined or challenge full
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /challenges/{challengeId}/checkins:
+    get:
+      operationId: listCheckins
+      tags: [checkins]
+      summary: List check-ins for a challenge
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of check-ins
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Checkin"
+    post:
+      operationId: createCheckin
+      tags: [checkins]
+      summary: Submit a daily check-in with photo
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCheckinBody"
+      responses:
+        "201":
+          description: Check-in created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Checkin"
+        "400":
+          description: Already checked in today or not a participant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /challenges/{challengeId}/summary:
+    get:
+      operationId: getChallengeSummary
+      tags: [challenges]
+      summary: Get challenge progress summary for both participants
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Challenge summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChallengeSummary"
+
+  /challenges/{challengeId}/upload-url:
+    post:
+      operationId: getUploadUrl
+      tags: [checkins]
+      summary: Get a pre-signed URL for photo upload
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlBody"
+      responses:
+        "200":
+          description: Upload URL generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +317,271 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        displayName:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - displayName
+        - createdAt
+
+    RegisterBody:
+      type: object
+      properties:
+        displayName:
+          type: string
+        pin:
+          type: string
+          minLength: 4
+          maxLength: 4
+      required:
+        - displayName
+        - pin
+
+    LoginBody:
+      type: object
+      properties:
+        displayName:
+          type: string
+        pin:
+          type: string
+      required:
+        - displayName
+        - pin
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required:
+        - user
+        - token
+
+    Participant:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        displayName:
+          type: string
+        joinedAt:
+          type: string
+      required:
+        - id
+        - userId
+        - displayName
+        - joinedAt
+
+    Challenge:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        goal:
+          type: string
+        wager:
+          type: string
+        durationDays:
+          type: integer
+        requiredCheckinsPerWeek:
+          type: integer
+        createdBy:
+          type: integer
+        inviteCode:
+          type: string
+        status:
+          type: string
+          enum: [pending, active, completed, cancelled]
+        startDate:
+          type: string
+          nullable: true
+        endDate:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - goal
+        - wager
+        - durationDays
+        - requiredCheckinsPerWeek
+        - createdBy
+        - inviteCode
+        - status
+        - createdAt
+
+    ChallengeWithParticipants:
+      allOf:
+        - $ref: "#/components/schemas/Challenge"
+        - type: object
+          properties:
+            participants:
+              type: array
+              items:
+                $ref: "#/components/schemas/Participant"
+          required:
+            - participants
+
+    CreateChallengeBody:
+      type: object
+      properties:
+        title:
+          type: string
+        goal:
+          type: string
+        wager:
+          type: string
+        durationDays:
+          type: integer
+        requiredCheckinsPerWeek:
+          type: integer
+      required:
+        - title
+        - goal
+        - wager
+        - durationDays
+        - requiredCheckinsPerWeek
+
+    Checkin:
+      type: object
+      properties:
+        id:
+          type: integer
+        challengeId:
+          type: integer
+        userId:
+          type: integer
+        displayName:
+          type: string
+        date:
+          type: string
+        photoUrl:
+          type: string
+          nullable: true
+        note:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - challengeId
+        - userId
+        - displayName
+        - date
+        - createdAt
+
+    CreateCheckinBody:
+      type: object
+      properties:
+        date:
+          type: string
+        photoUrl:
+          type: string
+          nullable: true
+        note:
+          type: string
+          nullable: true
+      required:
+        - date
+
+    ParticipantProgress:
+      type: object
+      properties:
+        userId:
+          type: integer
+        displayName:
+          type: string
+        totalCheckins:
+          type: integer
+        requiredCheckins:
+          type: integer
+        currentWeekCheckins:
+          type: integer
+        requiredPerWeek:
+          type: integer
+        metGoal:
+          type: boolean
+        streak:
+          type: integer
+        checkinDates:
+          type: array
+          items:
+            type: string
+      required:
+        - userId
+        - displayName
+        - totalCheckins
+        - requiredCheckins
+        - currentWeekCheckins
+        - requiredPerWeek
+        - metGoal
+        - streak
+        - checkinDates
+
+    ChallengeSummary:
+      type: object
+      properties:
+        challenge:
+          $ref: "#/components/schemas/ChallengeWithParticipants"
+        progress:
+          type: array
+          items:
+            $ref: "#/components/schemas/ParticipantProgress"
+        daysRemaining:
+          type: integer
+        winner:
+          type: string
+          nullable: true
+        outcome:
+          type: string
+          nullable: true
+      required:
+        - challenge
+        - progress
+        - daysRemaining
+
+    UploadUrlBody:
+      type: object
+      properties:
+        filename:
+          type: string
+        contentType:
+          type: string
+      required:
+        - filename
+        - contentType
+
+    UploadUrlResponse:
+      type: object
+      properties:
+        uploadUrl:
+          type: string
+        publicUrl:
+          type: string
+      required:
+        - uploadUrl
+        - publicUrl
