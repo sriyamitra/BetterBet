@@ -121,8 +121,7 @@ export default function Checkin() {
             <div className="flex justify-center">
               <input 
                 type="file" 
-                accept="image/*" 
-                capture="environment" 
+                accept="image/*"
                 className="hidden" 
                 ref={fileInputRef}
                 onChange={handleFileChange}
